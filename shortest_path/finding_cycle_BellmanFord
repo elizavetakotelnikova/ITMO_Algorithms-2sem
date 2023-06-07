@@ -1,0 +1,77 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+int inf = std::numeric_limits<double>::infinity();
+
+bool BellmanFord(int V, int E, int edges_list[][3], int K) {
+    int pred[V];
+    int distance[V];
+    int flag = false;
+    for (int i = 0; i < V; i++) {
+        pred[i] = inf;
+        distance[i] = inf;
+    }
+    int u, v, weight, start, cycle_length, j, i;
+    distance[0] = 0;
+    pred[0] = 0;
+    cycle_length = 0;
+    for (j = 0; j < V; j++) {
+        for (i = 0; i < E; i++) {
+            u = edges_list[i][0];
+            v = edges_list[i][1];
+            weight = edges_list[i][2];
+            if ((distance[u] != inf)) {
+                if (distance[v] > (distance[u] + weight)) {
+                    if (j == (V - 1)) {
+                        flag = true;
+                        start = v;
+                    }
+                    distance[v] = distance[u] + weight;
+                    pred[v] = u;
+                }
+            }
+        }
+    }
+    if (flag) {
+        for (i = 0; i < (V - 1); i++) {
+            start = pred[start];
+        }
+        v = pred[start];
+        cycle_length++;
+        while (v != start) {
+            v = pred[v];
+            cycle_length++;
+            if (cycle_length >= K) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    int V, M, u, v, i,  weight, max_length, N, j;
+    std::cin >> N >> max_length;
+    for (j = 0; j < N; j++) {
+        std::cin >> V >> M;
+        int edges_list[M][3];
+        for (i = 0; i < M; i++) {
+            std::cin >> u >> v >> weight;
+            edges_list[i][0] = u - 1;
+            edges_list[i][1] = v - 1;
+            edges_list[i][2] = weight;
+        }
+        if (max_length > M) {
+            std::cout << "YES";
+            continue;
+        }
+        if (BellmanFord(V, M, edges_list, max_length)) {
+            std::cout << "YES" << "\n";
+        } else {
+            std::cout << "NO" << "\n";
+        }
+    }
+    return 0;
+}
